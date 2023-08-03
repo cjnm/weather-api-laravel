@@ -1,66 +1,242 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# weather-api
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Introduction
 
-## About Laravel
+`weather-api` takes location data (longitude and latitude) as parameter and returns the current weather data for the given location.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The features of the APi are:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- User can signup, login and logout
+- Loggedin user can get the current weather data
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Setup
 
-## Learning Laravel
+### Prerequisite
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- PHP
+- MySQL
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Install
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- Install dependency
 
-## Laravel Sponsors
+```
+composer install
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+- Setup environment variable
 
-### Premium Partners
+```
+cp .env.example .env
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+Update the environment variables with necessary parameters. For `OPEN_WEATHER_MAP_API_KEY` get a new API Key from <https://openweathermap.org/>.
 
-## Contributing
+Add database credentials to the `.env` file.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Generate `JWT_SECRET`
 
-## Code of Conduct
+```
+php artisan jwt:secret
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- Starting the app
 
-## Security Vulnerabilities
+```
+php artisan serve
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Implementation
 
-## License
+### Endpoints
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+There are three endpoints available for user register, login and fetching the weather.
+The `Postman Collection` is available from the link <https://api.postman.com/collections/6610039-a367e4da-d9ad-4e74-9ac8-a55f7d5d0109?access_key=PMAT-01H6XTBJ9S96MXJ9S0TW0KMDAQ> or from `weather-api.postman_collection.json` available in this repo.
+
+The API is also hosted on <https://weather-api-laravel-799df554bbaa.herokuapp.com>.
+
+### Status Codes
+
+simpleblog API returns the following status codes.
+
+| Status Code |         Description          |
+| :---------- | :--------------------------: |
+| 200         |             `OK`             |
+| 401         | `BAD REQUEST` `Unauthorized` |
+| 500         |   `Internal Server Error`    |
+
+#### Success Response Example
+
+```
+{
+    success: true
+    message: 'Success',
+    data: []
+}
+```
+
+#### Failure Response Example
+
+```
+{
+    success: false
+    status: 401,
+    message: 'Failed, Unfortunately.'
+}
+```
+
+### Authentication
+
+The weather endpoint `/api/weather?lat=51.504694&lon=-0.113222` can be authenticated by sending `Authorization` header with the JWT Token from `/api/login/` with `Bearer` prefix.
+
+#### Auth header for API calls
+
+```
+{
+    Authorization: Bearer JWT_token,
+}
+```
+
+## API Endpoints
+
+#### 1. Register.
+
+`POST /api/register/`
+
+##### Auth header not required.
+##### Request Body
+```
+{
+    "name": "john",
+    "email": "john@test.com",
+    "password": "testpassword"
+}
+```
+
+##### Response Example
+
+```
+{
+    "success": true,
+    "message": "User created successfully",
+    "data": {
+        "name": "john",
+        "email": "john@test.com",
+        "updated_at": "2023-08-03T13:27:13.000000Z",
+        "created_at": "2023-08-03T13:27:13.000000Z",
+        "id": 5
+    }
+}
+```
+
+#### 2. Login.
+
+`POST /api/login`
+
+##### Auth header not required.
+##### Request Body
+```
+{
+    "email": "john@test.com",
+    "password": "testpassword"
+}
+```
+##### Response Example
+
+```
+{
+    "success": true,
+    "message": "Token created successfully",
+    "data": "eyJ0eXAizI1NiJ9.eyJpc3MiOiJIn0.YVFo2d7Hw"
+}
+```
+
+#### 3. Logout, invalidating the current token.
+
+`GET /api/logout`
+
+##### Auth header required.
+```
+{
+    Authorization: Bearer JWT_token,
+}
+```
+##### Response Example
+
+```
+{
+    "success":true,
+    "message":"User has been logged out"
+}
+```
+
+#### 4. Get weather data.
+
+`GET api/weather?lat={latitude}&lon={longitude}`
+
+###### Auth header required.
+```
+{
+    Authorization: Bearer JWT_token,
+}
+```
+
+##### Response Example
+
+```
+{
+    "success": true,
+    "message": "Weather data",
+    "data": {
+        "coord": {
+            "lon": -0.1138,
+            "lat": 51.5036
+        },
+        "weather": [
+            {
+                "id": 804,
+                "main": "Clouds",
+                "description": "overcast clouds",
+                "icon": "04d"
+            }
+        ],
+        "base": "stations",
+        "main": {
+            "temp": 293.43,
+            "feels_like": 293.05,
+            "temp_min": 291.59,
+            "temp_max": 294.89,
+            "pressure": 1005,
+            "humidity": 59
+        },
+        "visibility": 10000,
+        "wind": {
+            "speed": 3.6,
+            "deg": 320
+        },
+        "clouds": {
+            "all": 100
+        },
+        "dt": 1691068658,
+        "sys": {
+            "type": 2,
+            "id": 2075535,
+            "country": "GB",
+            "sunrise": 1691036794,
+            "sunset": 1691092002
+        },
+        "timezone": 3600,
+        "id": 6545250,
+        "name": "Lambeth",
+        "cod": 200
+    }
+}
+```
+
+```
+{
+    "success": false,
+    "message": "wrong longitude",
+    "data": ""
+}
+```

@@ -108,22 +108,15 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        //Validate token is coming in with request
-        $validator = Validator::make($request->only('token'), [
-            'token' => 'required'
-        ]);
+        // Get the authorization token.
+        $bearertoken = $request->header('Authorization');
 
-        //Send failed notice if request is not valid
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => $validator->messages(),
-            ], Response::HTTP_OK);
-        }
+        // Seperate the token part.
+        $token = explode(" ", $bearertoken)[1];
 
-        //Request is validated, do logout
         try {
-            JWTAuth::invalidate($request->token);
+            // Invalidate the token.
+            JWTAuth::manager()->invalidate(new \Tymon\JWTAuth\Token($token), false);
 
             return response()->json([
                 'success' => true,
@@ -131,15 +124,11 @@ class AuthController extends Controller
             ], Response::HTTP_OK);
 
         } catch (Exception $e) {
+            dd($e);
             return response()->json([
                 'success' => false,
                 'message' => 'User cannot be logged out'
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    }
-
-    public function user()
-    {
-        return 'Authenticated User';
     }
 }
