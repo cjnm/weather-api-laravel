@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\WeatherController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,5 +20,5 @@ Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 
 Route::group(['middleware' => ['jwt.verify']], function() {
-    Route::get('user', [AuthController::class, 'user']);
+    Route::get('weather', [WeatherController::class, 'getWeather']);
 });
